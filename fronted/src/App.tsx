@@ -85,6 +85,7 @@ function App() {
     setUser(null);
     setTestHistory([]);
     setCurrentView("dashboard");
+    localStorage.removeItem("userdata");
   };
 
   // Protected Route component
@@ -147,6 +148,7 @@ function App() {
                     onViewTestDetails={handleViewTestDetails}
                     onLogout={handleLogout}
                     user={user}
+                    setUserData={setUser}
                   />
                 )}
               </ProtectedRoute>

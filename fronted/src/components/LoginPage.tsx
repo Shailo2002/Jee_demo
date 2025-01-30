@@ -26,6 +26,11 @@ const LoginPage: React.FC<LoginProps> = ({
   isSignUp: initialIsSignUp = false,
 }) => {
   const navigate = useNavigate();
+  const userdata = JSON.parse(localStorage.getItem("userdata") || "{}");
+  if (userdata?.id?.length > 0) {
+    onLogin(userdata);
+    navigate("/");
+  }
   const [isSignUp, setIsSignUp] = useState(initialIsSignUp);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -90,6 +95,7 @@ const LoginPage: React.FC<LoginProps> = ({
           }
         );
         onLogin(newUser.data.user);
+        localStorage.setItem("userdata", JSON.stringify(newUser.data.user));
       }
     } catch (error) {
       console.error("Authentication error:", error);
