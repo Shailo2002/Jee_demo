@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, Github } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
 interface LoginProps {
   onLogin: (user: User) => void;
   isSignUp?: boolean;
@@ -70,20 +70,26 @@ const LoginPage: React.FC<LoginProps> = ({
 
       if (isSignUp) {
         // Handle sign up
-        const newUser = {
-          id: Math.random().toString(),
-          name,
-          email,
-        };
-        onLogin(newUser);
+
+        const newUser = await axios.post(
+          "http://localhost:5000/api/auth/register",
+          {
+            email,
+            password,
+            fullName: name,
+          }
+        );
+        onLogin(newUser.data.user);
       } else {
         // Handle sign in
-        const user = {
-          id: Math.random().toString(),
-          name: "John Doe", // This would come from your backend
-          email,
-        };
-        onLogin(user);
+        const newUser = await axios.post(
+          "http://localhost:5000/api/auth/login",
+          {
+            email,
+            password,
+          }
+        );
+        onLogin(newUser.data.user);
       }
     } catch (error) {
       console.error("Authentication error:", error);

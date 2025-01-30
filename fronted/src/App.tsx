@@ -8,7 +8,6 @@ import {
 import TestInterface from "./components/TestInterface";
 import Dashboard from "./components/Dashboard";
 import TestAnalysis from "./components/TestAnalysis";
-import Header from "./components/Header";
 import LoginPage from "./components/LoginPage";
 import Instructions from "./components/Instructions";
 
@@ -39,7 +38,6 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
   const [currentSection, setCurrentSection] = useState("physics");
-  const [language, setLanguage] = useState("english");
   const [currentView, setCurrentView] = useState<View>("dashboard");
   const [selectedResult, setSelectedResult] = useState<TestResult | null>(null);
   const [testHistory, setTestHistory] = useState<TestResult[]>([]);
@@ -100,14 +98,6 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        {isLoggedIn && (
-          <Header
-            language={language}
-            onLanguageChange={setLanguage}
-            userName={user?.name}
-            onLogout={handleLogout}
-          />
-        )}
         <Routes>
           <Route
             path="/login"
@@ -156,6 +146,7 @@ function App() {
                     onStartTest={handleStartTest}
                     onViewTestDetails={handleViewTestDetails}
                     onLogout={handleLogout}
+                    user={user}
                   />
                 )}
               </ProtectedRoute>
