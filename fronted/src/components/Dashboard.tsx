@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Clock,
   BookOpen,
@@ -23,6 +23,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import MyTests from "./MyTests";
 import Analytics from "./Analytics";
+import TestHistory from "./TestHistory";
 
 interface Test {
   id: string;
@@ -60,6 +61,28 @@ interface User {
   email: string;
 }
 
+interface TestHistoryItem {
+  _id: string;
+  testId: {
+    title: string;
+    totalQuestions: number;
+  };
+  startTime: string;
+  endTime: string;
+  overallPerformance: {
+    score: number;
+    totalAttempted: number;
+    totalCorrect: number;
+    totalIncorrect: number;
+    accuracy: number;
+  };
+  sectionWisePerformance: {
+    subject: string;
+    score: number;
+    accuracy: number;
+  }[];
+}
+
 interface DashboardProps {
   lastTestResult: TestResult | null;
   onStartTest: (testId: string) => void;
@@ -73,7 +96,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   lastTestResult,
   onStartTest,
   onViewTestDetails,
-  testHistory,
+  testHistory: propTestHistory,
   onLogout,
   user,
 }) => {
@@ -118,8 +141,46 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [searchResults, setSearchResults] = useState<Test[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [currentView, setCurrentView] = useState<
-    "dashboard" | "tests" | "analytics"
+    "dashboard" | "tests" | "analytics" | "history"
   >("dashboard");
+
+  const [recentTests, setRecentTests] = useState<TestHistoryItem[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch test history
+        const historyResponse = await fetch("/api/tests/history", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const historyData = await historyResponse.json();
+        setRecentTests(historyData);
+
+        // Fetch analytics for stats
+        const analyticsResponse = await fetch("/api/analytics", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const analyticsData = await analyticsResponse.json();
+
+        // Update stats with analytics data
+        setStats({
+          totalTests: analyticsData.totalTestsTaken,
+          averageScore: analyticsData.averageScore,
+          totalTime:
+            analyticsData.timeManagement.averageTestDuration *
+            analyticsData.totalTestsTaken,
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -150,7 +211,9 @@ const Dashboard: React.FC<DashboardProps> = ({
       case "tests":
         return <MyTests onStartTest={onStartTest} />;
       case "analytics":
-        return <Analytics testHistory={testHistory} />;
+        return <Analytics testHistory={recentTests} />;
+      case "history":
+        return <TestHistory />;
       default:
         return (
           <>
@@ -174,7 +237,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       <div>
                         <p className="text-blue-100 text-sm">Tests Taken</p>
                         <p className="text-white text-2xl font-bold mt-1">
-                          {testHistory.length}
+                          {recentTests.length}
                         </p>
                       </div>
                       <BookOpen className="w-8 h-8 text-blue-100" />
@@ -314,7 +377,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </h2>
                     </div>
                     <div className="divide-y divide-gray-100">
-                      {testHistory.length === 0 ? (
+                      {recentTests.length === 0 ? (
                         <div className="p-8 text-center">
                           <Calendar className="w-8 h-8 text-gray-400 mx-auto mb-3" />
                           <p className="text-gray-500">
@@ -325,9 +388,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </p>
                         </div>
                       ) : (
-                        testHistory.map((result, index) => (
+                        recentTests.map((test) => (
                           <div
-                            key={index}
+                            key={test._id}
                             className="p-4 hover:bg-gray-50 transition-colors"
                           >
                             <div className="flex items-center justify-between">
@@ -339,34 +402,33 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 </div>
                                 <div>
                                   <h3 className="text-sm font-medium text-gray-800">
-                                    {result.testTitle}
+                                    {test.testId.title}
                                   </h3>
                                   <p className="text-xs text-gray-500 mt-1">
                                     {new Date(
-                                      result.testDate
-                                    ).toLocaleDateString("en-US", {
-                                      day: "numeric",
-                                      month: "short",
-                                      year: "numeric",
-                                    })}
+                                      test.completedAt
+                                    ).toLocaleDateString()}
                                   </p>
                                 </div>
                               </div>
                               <div className="flex items-center space-x-4">
                                 <div className="text-right">
                                   <div className="text-sm font-medium text-gray-800">
-                                    {result.score}/300
+                                    {test.score}/
+                                    {test.testId.totalQuestions * 4}
                                   </div>
                                   <div
                                     className={`text-xs ${
-                                      getPerformanceStatus(result.score).color
+                                      getPerformanceStatus(test.score).color
                                     }`}
                                   >
-                                    {getPerformanceStatus(result.score).text}
+                                    {getPerformanceStatus(test.score).text}
                                   </div>
                                 </div>
                                 <button
-                                  onClick={() => onViewTestDetails(result)}
+                                  onClick={() =>
+                                    onViewTestDetails(test as TestResult)
+                                  }
                                   className="p-2 hover:bg-blue-50 rounded-full transition-colors"
                                 >
                                   <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -567,6 +629,16 @@ const Dashboard: React.FC<DashboardProps> = ({
                   } transition-colors`}
                 >
                   Analytics
+                </button>
+                <button
+                  onClick={() => setCurrentView("history")}
+                  className={`text-sm font-medium ${
+                    currentView === "history"
+                      ? "text-blue-600"
+                      : "text-gray-500 hover:text-blue-600"
+                  } transition-colors`}
+                >
+                  Test History
                 </button>
               </nav>
 
@@ -775,6 +847,19 @@ const Dashboard: React.FC<DashboardProps> = ({
                     } rounded-lg hover:bg-gray-50`}
                   >
                     Analytics
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCurrentView("history");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`block w-full px-3 py-2 text-left text-base font-medium ${
+                      currentView === "history"
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-gray-500"
+                    } rounded-lg hover:bg-gray-50`}
+                  >
+                    Test History
                   </button>
                 </div>
 

@@ -2,6 +2,8 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import TestHistory from "../models/TestHistory.js";
+import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -77,6 +79,34 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Update test history endpoints
+router.post("/save-test-history", auth, async (req, res) => {
+  try {
+    const { testName, score, totalQuestions } = req.body;
+    const testHistory = new TestHistory({
+      userId: req.user.id,
+      testName,
+      score,
+      totalQuestions,
+    });
+    await testHistory.save();
+    res.json({ success: true, testHistory });
+  } catch (error) {
+    res.status(500).json({ error: "Error saving test history" });
+  }
+});
+
+router.get("/test-history", auth, async (req, res) => {
+  try {
+    const testHistory = await TestHistory.find({ userId: req.user.id })
+      .sort({ completedAt: -1 })
+      .limit(10);
+    res.json(testHistory);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching test history" });
   }
 });
 

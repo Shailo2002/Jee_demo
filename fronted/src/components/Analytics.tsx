@@ -1,196 +1,151 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Clock, Target, Brain, TrendingUp } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { TrendingUp, Clock, Target, Award } from "lucide-react";
 
-interface TestResult {
-  score: number;
-  attempted: number;
-  correct: number;
-  incorrect: number;
-  unattempted: number;
-  questionTimes: Record<number, number>;
-  testDate: Date;
-  testId: string;
-  testTitle: string;
+interface AnalyticsData {
+  totalTestsTaken: number;
+  averageScore: number;
+  subjectWisePerformance: {
+    Physics: SubjectStats;
+    Chemistry: SubjectStats;
+    Mathematics: SubjectStats;
+  };
+  timeManagement: {
+    averageTimePerQuestion: number;
+    averageTestDuration: number;
+  };
 }
 
-interface AnalyticsProps {
-  testHistory: TestResult[];
+interface SubjectStats {
+  averageScore: number;
+  averageAccuracy: number;
+  totalAttempted: number;
 }
 
-const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
-  // Calculate average scores by subject
-  const subjectScores = {
-    Physics: 75,
-    Chemistry: 68,
-    Mathematics: 82
+const Analytics: React.FC = () => {
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch("/api/analytics", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await response.json();
+      setAnalyticsData(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+      setLoading(false);
+    }
   };
 
-  // Prepare data for time distribution chart
-  const timeDistribution = [
-    { name: '0-30 sec', value: 25 },
-    { name: '30-60 sec', value: 40 },
-    { name: '60-90 sec', value: 20 },
-    { name: '90+ sec', value: 15 }
-  ];
+  if (loading) {
+    return <div>Loading analytics...</div>;
+  }
 
-  // Colors for charts
-  const COLORS = ['#3B82F6', '#34D399', '#F87171', '#A78BFA'];
-
-  // Calculate performance metrics
-  const averageScore = testHistory.reduce((acc, test) => acc + test.score, 0) / testHistory.length;
-  const averageAccuracy = testHistory.reduce((acc, test) => acc + (test.correct / test.attempted) * 100, 0) / testHistory.length;
+  if (!analyticsData) {
+    return <div>No analytics data available</div>;
+  }
 
   return (
-    <>
-      {/* Analytics Header Banner */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-2xl font-bold text-white">Analytics</h1>
-          <p className="mt-1 text-blue-100">Track your performance and progress</p>
-          
-          {/* Quick Stats in Header */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Average Score</p>
-                  <p className="text-white text-2xl font-bold mt-1">
-                    {averageScore.toFixed(1)}
-                  </p>
-                </div>
-                <Target className="w-8 h-8 text-blue-100" />
-              </div>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Accuracy</p>
-                  <p className="text-white text-2xl font-bold mt-1">
-                    {averageAccuracy.toFixed(1)}%
-                  </p>
-                </div>
-                <Brain className="w-8 h-8 text-blue-100" />
-              </div>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Tests Taken</p>
-                  <p className="text-white text-2xl font-bold mt-1">
-                    {testHistory.length}
-                  </p>
-                </div>
-                <Clock className="w-8 h-8 text-blue-100" />
-              </div>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Improvement</p>
-                  <p className="text-white text-2xl font-bold mt-1">+12%</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-blue-100" />
-              </div>
-            </div>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6">Performance Analytics</h2>
+
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-gray-500">Tests Taken</h3>
+            <Target className="text-blue-500 w-6 h-6" />
           </div>
+          <p className="text-3xl font-bold">{analyticsData.totalTestsTaken}</p>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-gray-500">Average Score</h3>
+            <Award className="text-green-500 w-6 h-6" />
+          </div>
+          <p className="text-3xl font-bold">
+            {analyticsData.averageScore.toFixed(1)}%
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-gray-500">Avg Time/Test</h3>
+            <Clock className="text-purple-500 w-6 h-6" />
+          </div>
+          <p className="text-3xl font-bold">
+            {Math.round(analyticsData.timeManagement.averageTestDuration / 60)}m
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-gray-500">Progress</h3>
+            <TrendingUp className="text-orange-500 w-6 h-6" />
+          </div>
+          <p className="text-3xl font-bold">+12%</p>
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Score Trends */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Score Trends</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={testHistory}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="testTitle" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="score" fill="#3B82F6" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Subject-wise Performance */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Subject Performance</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={Object.entries(subjectScores).map(([name, value]) => ({ name, value }))}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name} (${value}%)`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {Object.entries(subjectScores).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Time Distribution */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Time Distribution</h2>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={timeDistribution}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#A78BFA" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Improvement Areas */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Areas for Improvement</h2>
-            <div className="space-y-4">
-              {Object.entries(subjectScores).map(([subject, score]) => (
-                <div key={subject}>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600">{subject}</span>
-                    <span className="text-blue-600 font-medium">{score}%</span>
+      {/* Subject-wise Performance */}
+      <div className="bg-white p-6 rounded-lg shadow mb-8">
+        <h3 className="text-xl font-semibold mb-6">Subject-wise Performance</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Object.entries(analyticsData.subjectWisePerformance).map(
+            ([subject, stats]) => (
+              <div key={subject} className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-700 mb-4">{subject}</h4>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Average Score</span>
+                      <span className="font-medium">
+                        {stats.averageScore.toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full">
+                      <div
+                        className="h-full bg-blue-500 rounded-full"
+                        style={{ width: `${stats.averageScore}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-blue-500 rounded-full" 
-                      style={{ width: `${score}%` }} 
-                    />
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Accuracy</span>
+                      <span className="font-medium">
+                        {stats.averageAccuracy.toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full">
+                      <div
+                        className="h-full bg-green-500 rounded-full"
+                        style={{ width: `${stats.averageAccuracy}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Tests Attempted: {stats.totalAttempted}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            )
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default Analytics; 
+export default Analytics;
