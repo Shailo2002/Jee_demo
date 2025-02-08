@@ -49,14 +49,21 @@ const testAttemptSchema = new mongoose.Schema({
   questionTimes: {
     type: Map,
     of: Number, // Store time taken for each question in seconds
+    required: true,
   },
   answers: {
     type: Map,
     of: String, // Store user's answers
+    required: true,
   },
   correctAnswers: {
     type: Map,
     of: String, // Store correct answers
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

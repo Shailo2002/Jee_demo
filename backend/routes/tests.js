@@ -5,7 +5,7 @@ import authenticate from "../middleware/authenticate.js";
 const router = express.Router();
 
 router.post("/submit", authenticate, async (req, res) => {
-  console.log("backend checkpoitn");
+  console.log("backend checkpoint");
   try {
     const {
       score,
@@ -22,10 +22,21 @@ router.post("/submit", authenticate, async (req, res) => {
       sectionWiseAnalysis,
     } = req.body;
 
+    // Handle sectionWiseAnalysis - ensure it's an array or use empty array
+    let formattedSectionAnalysis = [];
+    if (Array.isArray(sectionWiseAnalysis)) {
+      formattedSectionAnalysis = sectionWiseAnalysis.map((section) => ({
+        sectionName: section.sectionName || "Unknown Section",
+        attempted: section.attempted || 0,
+        correct: section.correct || 0,
+        incorrect: section.incorrect || 0,
+        score: section.score || 0,
+      }));
+    }
+
     // Create TestResult document
-    console.log("score", score);
     const testResult = new TestResult({
-      userId: req.user._id, // From auth middleware
+      userId: req.user._id,
       testId,
       testTitle,
       score,
@@ -34,9 +45,9 @@ router.post("/submit", authenticate, async (req, res) => {
       incorrect,
       unattempted,
       totalTime,
-      sectionWiseAnalysis,
+      sectionWiseAnalysis: formattedSectionAnalysis, // Use the formatted array
     });
-
+    console.log("testResult", testResult);
     await testResult.save();
 
     // Create TestAttempt document
@@ -59,7 +70,7 @@ router.post("/submit", authenticate, async (req, res) => {
     });
 
     await testAttempt.save();
-
+    console.log("final check");
     res.status(201).json({
       message: "Test result saved successfully",
       testResultId: testResult._id,
