@@ -86,7 +86,9 @@ function App() {
     setTestHistory([]);
     setCurrentView("dashboard");
     localStorage.removeItem("userdata");
+    localStorage.removeItem("token");
   };
+
 
   // Protected Route component
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

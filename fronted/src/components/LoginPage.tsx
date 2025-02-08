@@ -95,8 +95,10 @@ const LoginPage: React.FC<LoginProps> = ({
           }
         );
         onLogin(newUser.data.user);
+        localStorage.setItem("token", JSON.stringify(newUser.data.token));
         localStorage.setItem("userdata", JSON.stringify(newUser.data.user));
       }
+
     } catch (error) {
       console.error("Authentication error:", error);
     } finally {
