@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Clock,
   BookOpen,
@@ -23,6 +23,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import MyTests from "./MyTests";
 import Analytics from "./Analytics";
+import axios from "axios";
 
 interface Test {
   id: string;
@@ -44,6 +45,24 @@ interface TestResult {
   testDate: Date;
   testId: string;
   testTitle: string;
+}
+
+interface TestAttempt {
+  userId: string;
+  testId: string;
+  testResultId: string;
+  startTime: Date;
+  endTime: Date;
+  questions: {
+    questionNumber: number;
+    selectedAnswer: string;
+    correctAnswer: string;
+    timeTaken: number;
+    isCorrect: boolean;
+  }[];
+  questionTimes: Record<number, number>;
+  answers: Record<number, string>;
+  correctAnswers: Record<number, string>;
 }
 
 interface Notification {
@@ -73,7 +92,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   lastTestResult,
   onStartTest,
   onViewTestDetails,
-  testHistory,
+  testHistory1,
   onLogout,
   user,
 }) => {
@@ -93,6 +112,30 @@ const Dashboard: React.FC<DashboardProps> = ({
       subject: "Physics, Chemistry, Mathematics",
     },
   ];
+
+  const [testHistory, setTestHistory] = useState<TestResult[]>([]);
+  const [testAttempts, setTestAttempts] = useState<TestAttempt[]>([]);
+  useEffect(() => {
+    const fetchTestHistory = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/tests/history",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(
+                localStorage.getItem("token") || ""
+              )}`,
+            },
+          }
+        );
+        setTestHistory(response.data.testResults);
+        setTestAttempts(response.data.testAttempts);
+      } catch (error) {
+        console.error("Error fetching test history:", error);
+      }
+    };
+    fetchTestHistory();
+  }, []);
 
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -366,7 +409,27 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   </div>
                                 </div>
                                 <button
-                                  onClick={() => onViewTestDetails(result)}
+                                  onClick={() => {
+                                    const testAttempt = testAttempts.find(
+                                      (attempt) =>
+                                        attempt.testId === result.testId
+                                    );
+                                    if (testAttempt) {
+                                      // Combine the data from TestResult and TestAttempt
+                                      const combinedResult: TestResult = {
+                                        ...result,
+                                        questionTimes:
+                                          testAttempt.questionTimes,
+                                        answers: testAttempt.answers,
+                                        correctAnswers:
+                                          testAttempt.correctAnswers,
+                                        testDate: new Date(testAttempt.endTime), // Use endTime as testDate
+                                        testId: testAttempt.testId,
+                                        testTitle: result.testTitle,
+                                      };
+                                      onViewTestDetails(combinedResult);
+                                    }
+                                  }}
                                   className="p-2 hover:bg-blue-50 rounded-full transition-colors"
                                 >
                                   <ChevronRight className="w-5 h-5 text-gray-400" />

@@ -47,7 +47,7 @@ router.post("/submit", authenticate, async (req, res) => {
       totalTime,
       sectionWiseAnalysis: formattedSectionAnalysis, // Use the formatted array
     });
-    console.log("testResult", testResult);
+
     await testResult.save();
 
     // Create TestAttempt document
@@ -70,7 +70,7 @@ router.post("/submit", authenticate, async (req, res) => {
     });
 
     await testAttempt.save();
-    console.log("final check");
+
     res.status(201).json({
       message: "Test result saved successfully",
       testResultId: testResult._id,
@@ -81,4 +81,14 @@ router.post("/submit", authenticate, async (req, res) => {
   }
 });
 
+router.get("/history", authenticate, async (req, res) => {
+  try {
+    const testResults = await TestResult.find({ userId: req.user._id });
+    const testAttempts = await TestAttempt.find({ userId: req.user._id });
+    res.status(200).json({ testResults, testAttempts });
+  } catch (error) {
+    console.error("Error fetching test history:", error);
+    res.status(500).json({ error: "Failed to fetch test history" });
+  }
+});
 export default router;
