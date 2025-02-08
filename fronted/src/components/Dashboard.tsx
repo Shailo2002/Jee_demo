@@ -24,6 +24,7 @@ import { formatDistanceToNow } from "date-fns";
 import MyTests from "./MyTests";
 import Analytics from "./Analytics";
 import axios from "axios";
+import { Backend_URL } from "../contant";
 
 interface Test {
   id: string;
@@ -118,8 +119,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   useEffect(() => {
     const fetchTestHistory = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/tests/history",
+        const response = await axios.get(`${Backend_URL}/api/tests/history`,
+          // "http://localhost:5000/api/tests/history",
           {
             headers: {
               Authorization: `Bearer ${JSON.parse(

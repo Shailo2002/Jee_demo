@@ -4,6 +4,7 @@ import QuestionPanel from "./QuestionPanel";
 import QuestionPalette from "./QuestionPalette";
 import ResultModal from "./ResultModal";
 import axios from "axios";
+import { Backend_URL } from "../contant";
 
 interface TestResult {
   score: number;
@@ -266,7 +267,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
     try {
       // Send the test result to the backend
       const response = await axios.post(
-        "http://localhost:5000/api/tests/submit",
+        `${Backend_URL}/api/tests/submit`,
+        // "http://localhost:5000/api/tests/submit",
         result,
         {
           headers: {
