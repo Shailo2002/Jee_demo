@@ -73,6 +73,7 @@ const LoginPage: React.FC<LoginProps> = ({
     setIsLoading(true);
     try {
       // Simulate API call
+
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       if (isSignUp) {
@@ -98,11 +99,13 @@ const LoginPage: React.FC<LoginProps> = ({
             password,
           }
         );
+        console.log("check in handleSubmit");
         onLogin(newUser.data.user);
         localStorage.setItem("token", JSON.stringify(newUser.data.token));
         localStorage.setItem("userdata", JSON.stringify(newUser.data.user));
       }
     } catch (error) {
+      alert("Invalid credentials");
       console.error("Authentication error:", error);
     } finally {
       setIsLoading(false);

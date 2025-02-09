@@ -12,7 +12,7 @@ interface Test {
 }
 
 interface MyTestsProps {
-  onStartTest: (testId: string) => void;
+  onStartTest: (testId: string, testTitle: string) => void;
 }
 
 const MyTests: React.FC<MyTestsProps> = ({ onStartTest }) => {
@@ -132,7 +132,7 @@ const MyTests: React.FC<MyTestsProps> = ({ onStartTest }) => {
                   </div>
 
                   <button
-                    onClick={() => onStartTest(test.id)}
+                    onClick={() => onStartTest(test.id, test.title)}
                     className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Start Test

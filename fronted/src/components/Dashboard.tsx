@@ -82,7 +82,7 @@ interface User {
 
 interface DashboardProps {
   lastTestResult: TestResult | null;
-  onStartTest: (testId: string) => void;
+  onStartTest: (testId: string, testTitle: string) => void;
   onViewTestDetails: (result: TestResult) => void;
   testHistory: TestResult[];
   onLogout: () => void;
@@ -93,7 +93,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   lastTestResult,
   onStartTest,
   onViewTestDetails,
-  testHistory1,
   onLogout,
   user,
 }) => {
@@ -112,14 +111,84 @@ const Dashboard: React.FC<DashboardProps> = ({
       totalQuestions: 75,
       subject: "Physics, Chemistry, Mathematics",
     },
+    {
+      id: "test3",
+      title: "JEE Advanced Mock Test 1",
+      duration: 180,
+      totalQuestions: 90,
+      subject: "Physics, Chemistry, Mathematics",
+    },
+    {
+      id: "test4",
+      title: "JEE Advanced Mock Test 2",
+      duration: 180,
+      totalQuestions: 90,
+      subject: "Physics, Chemistry, Mathematics",
+    },
+    {
+      id: "test5",
+      title: "NEET Biology Mock Test",
+      duration: 180,
+      totalQuestions: 100,
+      subject: "Biology",
+    },
+    {
+      id: "test6",
+      title: "Physics Olympiad Practice Test",
+      duration: 120,
+      totalQuestions: 50,
+      subject: "Physics",
+    },
+    {
+      id: "test7",
+      title: "Chemistry Olympiad Practice Test",
+      duration: 120,
+      totalQuestions: 50,
+      subject: "Chemistry",
+    },
+    {
+      id: "test8",
+      title: "Mathematics Olympiad Practice Test",
+      duration: 150,
+      totalQuestions: 60,
+      subject: "Mathematics",
+    },
+    {
+      id: "test9",
+      title: "Physics Revision Test",
+      duration: 90,
+      totalQuestions: 30,
+      subject: "Physics",
+    },
+    {
+      id: "test10",
+      title: "NEET Chemistry Mock Test",
+      duration: 180,
+      totalQuestions: 100,
+      subject: "Chemistry",
+    },
+    {
+      id: "test11",
+      title: "JEE Mock Test 3",
+      duration: 180,
+      totalQuestions: 75,
+      subject: "Physics, Chemistry, Mathematics",
+    },
+    {
+      id: "test12",
+      title: "JEE Mock Test 4",
+      duration: 180,
+      totalQuestions: 75,
+      subject: "Physics, Chemistry, Mathematics",
+    },
   ];
-
   const [testHistory, setTestHistory] = useState<TestResult[]>([]);
   const [testAttempts, setTestAttempts] = useState<TestAttempt[]>([]);
   useEffect(() => {
     const fetchTestHistory = async () => {
       try {
-        const response = await axios.get(`${Backend_URL}/api/tests/history`,
+        const response = await axios.get(
+          `${Backend_URL}/api/tests/history`,
           // "http://localhost:5000/api/tests/history",
           {
             headers: {
@@ -187,6 +256,18 @@ const Dashboard: React.FC<DashboardProps> = ({
     if (score >= 150) return { color: "text-yellow-500", text: "Average" };
     return { color: "text-red-500", text: "Needs Improvement" };
   };
+
+  // Create a function to filter out completed tests
+  const getUncompletedTests = () => {
+    // Get array of completed test IDs
+    const completedTestIds = testHistory.map((result) => result.testId);
+
+    // Filter availableTests to exclude completed ones
+    return availableTests.filter((test) => !completedTestIds.includes(test.id));
+  };
+
+  // Get uncompleted tests
+  const upcomingTests = getUncompletedTests();
 
   // This function will render the main content based on current view
   const renderMainContent = () => {
@@ -259,25 +340,27 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
                       Quick Actions
                     </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      {availableTests.map((test) => (
-                        <button
-                          key={test.id}
-                          onClick={() => onStartTest(test.id)}
-                          className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
-                        >
-                          <BookMarked className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
-                          <span className="text-sm font-medium text-gray-700 text-center group-hover:text-blue-600">
-                            {test.title}
+                    <div className="max-h-[240px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-50 pr-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {upcomingTests.map((test) => (
+                          <button
+                            key={test.id}
+                            onClick={() => onStartTest(test.id, test.title)}
+                            className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
+                          >
+                            <BookMarked className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+                            <span className="text-sm font-medium text-gray-700 text-center group-hover:text-blue-600">
+                              {test.title}
+                            </span>
+                          </button>
+                        ))}
+                        <button className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group">
+                          <Target className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
+                          <span className="text-sm font-medium text-gray-700 text-center group-hover:text-purple-600">
+                            Practice Tests
                           </span>
                         </button>
-                      ))}
-                      <button className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group">
-                        <Target className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
-                        <span className="text-sm font-medium text-gray-700 text-center group-hover:text-purple-600">
-                          Practice Tests
-                        </span>
-                      </button>
+                      </div>
                     </div>
                   </div>
 
@@ -496,28 +579,44 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
                       Upcoming Tests
                     </h2>
-                    <div className="space-y-4">
-                      {availableTests.map((test) => (
-                        <div
-                          key={test.id}
-                          className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-blue-100 hover:bg-blue-50 transition-all"
-                        >
-                          <div>
-                            <h3 className="text-sm font-medium text-gray-800">
-                              {test.title}
-                            </h3>
-                            <p className="text-xs text-gray-500 mt-1">
-                              {test.subject}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => onStartTest(test.id)}
-                            className="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
-                          >
-                            Start
-                          </button>
+                    <div className="space-y-4 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-50 pr-2">
+                      {upcomingTests.length === 0 ? (
+                        <div className="text-center py-4">
+                          <p className="text-gray-500">
+                            No upcoming tests available
+                          </p>
+                          <p className="text-sm text-gray-400 mt-1">
+                            You have completed all available tests
+                          </p>
                         </div>
-                      ))}
+                      ) : (
+                        upcomingTests.map((test) => (
+                          <div
+                            key={test.id}
+                            className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-blue-100 hover:bg-blue-50 transition-all"
+                          >
+                            <div>
+                              <h3 className="text-sm font-medium text-gray-800">
+                                {test.title}
+                              </h3>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {test.subject}
+                              </p>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                console.log("testid", test.id);
+                                console.log("testtitle", test.title);
+                                onStartTest(test.id, test.title);
+                              }}
+                              className="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                            >
+                              Start
+                            </button>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -579,7 +678,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <button
                           key={test.id}
                           onClick={() => {
-                            onStartTest(test.id);
+                            onStartTest(test.id, test.title);
                             setSearchQuery("");
                           }}
                           className="w-full px-4 py-2 text-left hover:bg-gray-50"
