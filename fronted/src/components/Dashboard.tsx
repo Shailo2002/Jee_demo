@@ -139,6 +139,48 @@ const Dashboard: React.FC<DashboardProps> = ({
       totalQuestions: 50,
       subject: "Physics",
     },
+    {
+      id: "test7",
+      title: "Chemistry Olympiad Practice Test",
+      duration: 120,
+      totalQuestions: 50,
+      subject: "Chemistry",
+    },
+    {
+      id: "test8",
+      title: "Mathematics Olympiad Practice Test",
+      duration: 150,
+      totalQuestions: 60,
+      subject: "Mathematics",
+    },
+    {
+      id: "test9",
+      title: "Physics Revision Test",
+      duration: 90,
+      totalQuestions: 30,
+      subject: "Physics",
+    },
+    {
+      id: "test10",
+      title: "NEET Chemistry Mock Test",
+      duration: 180,
+      totalQuestions: 100,
+      subject: "Chemistry",
+    },
+    {
+      id: "test11",
+      title: "JEE Mock Test 3",
+      duration: 180,
+      totalQuestions: 75,
+      subject: "Physics, Chemistry, Mathematics",
+    },
+    {
+      id: "test12",
+      title: "JEE Mock Test 4",
+      duration: 180,
+      totalQuestions: 75,
+      subject: "Physics, Chemistry, Mathematics",
+    },
   ];
   const [testHistory, setTestHistory] = useState<TestResult[]>([]);
   const [testAttempts, setTestAttempts] = useState<TestAttempt[]>([]);
@@ -298,25 +340,27 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
                       Quick Actions
                     </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      {upcomingTests.map((test) => (
-                        <button
-                          key={test.id}
-                          onClick={() => onStartTest(test.id, test.title)}
-                          className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
-                        >
-                          <BookMarked className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
-                          <span className="text-sm font-medium text-gray-700 text-center group-hover:text-blue-600">
-                            {test.title}
+                    <div className="max-h-[240px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-50 pr-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {upcomingTests.map((test) => (
+                          <button
+                            key={test.id}
+                            onClick={() => onStartTest(test.id, test.title)}
+                            className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
+                          >
+                            <BookMarked className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+                            <span className="text-sm font-medium text-gray-700 text-center group-hover:text-blue-600">
+                              {test.title}
+                            </span>
+                          </button>
+                        ))}
+                        <button className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group">
+                          <Target className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
+                          <span className="text-sm font-medium text-gray-700 text-center group-hover:text-purple-600">
+                            Practice Tests
                           </span>
                         </button>
-                      ))}
-                      <button className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group">
-                        <Target className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
-                        <span className="text-sm font-medium text-gray-700 text-center group-hover:text-purple-600">
-                          Practice Tests
-                        </span>
-                      </button>
+                      </div>
                     </div>
                   </div>
 
@@ -535,7 +579,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
                       Upcoming Tests
                     </h2>
-                    <div className="space-y-4">
+                    <div className="space-y-4 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-50 pr-2">
                       {upcomingTests.length === 0 ? (
                         <div className="text-center py-4">
                           <p className="text-gray-500">
