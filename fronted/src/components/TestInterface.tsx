@@ -276,7 +276,6 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
       testDate: new Date(),
     };
 
-    console.log("Final result object:", result);
     try {
       // Send the test result to the backend
       const response = await axios.post(

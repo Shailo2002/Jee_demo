@@ -49,8 +49,9 @@ function App() {
     setIsLoggedIn(true);
   };
 
-  const handleStartTest = (testId: string) => {
+  const handleStartTest = (testId: string, testTitle: string) => {
     setSelectedTestId(testId);
+    setCurrentTestTitle(testTitle);
     setCurrentView("instructions");
   };
 
@@ -63,8 +64,7 @@ function App() {
       ...result,
       testDate: new Date(),
       testId: selectedTestId!,
-      testTitle:
-        selectedTestId === "test1" ? "JEE Mock Test 1" : "JEE Mock Test 2",
+      testTitle: currentTestTitle!,
     };
     setSelectedResult(newResult);
     setTestHistory((prev) => [...prev, newResult]);
@@ -140,11 +140,7 @@ function App() {
                     onSectionChange={handleSectionChange}
                     onTestComplete={handleTestComplete}
                     testId={selectedTestId}
-                    testTitle={
-                      selectedTestId === "test1"
-                        ? "JEE Mock Test 1"
-                        : "JEE Mock Test 2"
-                    }
+                    testTitle={currentTestTitle || ""}
                   />
                 )}
                 {currentView === "analysis" && selectedResult && (
