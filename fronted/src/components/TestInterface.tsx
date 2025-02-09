@@ -5,6 +5,7 @@ import QuestionPalette from "./QuestionPalette";
 import ResultModal from "./ResultModal";
 import axios from "axios";
 import { Backend_URL } from "../contant";
+import { useLocation } from "react-router-dom";
 
 interface TestResult {
   score: number;
@@ -24,13 +25,20 @@ interface TestInterfaceProps {
   currentSection: string;
   onSectionChange: (section: string) => void;
   onTestComplete: (result: TestResult) => void;
+  testId: string;
+  testTitle: string;
 }
 
 const TestInterface: React.FC<TestInterfaceProps> = ({
   currentSection,
   onSectionChange,
   onTestComplete,
+  testId,
+  testTitle,
 }) => {
+  console.log("TestInterface Props - testId:", testId);
+  console.log("TestInterface Props - testTitle:", testTitle);
+
   const [timeLeft, setTimeLeft] = useState(180 * 60); // 180 minutes in seconds
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -164,6 +172,9 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
   const handleSubmitTest = async () => {
     if (isTestSubmitted) return;
 
+    console.log("Submitting test with ID:", testId);
+    console.log("Submitting test with Title:", testTitle);
+
     // Calculate time for the last question
     const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
     if (timeSpent > 0) {
@@ -258,12 +269,14 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
       questionTimes: testResult.questionTimes,
       answers,
       correctAnswers,
-      testId: "test1", // You should get this from props or context
-      testTitle: "JEE Mock Test 1", // You should get this from props or context
+      testId: testId,
+      testTitle: testTitle,
       totalTime,
       sectionWiseAnalysis,
+      testDate: new Date(),
     };
 
+    console.log("Final result object:", result);
     try {
       // Send the test result to the backend
       const response = await axios.post(

@@ -82,7 +82,7 @@ interface User {
 
 interface DashboardProps {
   lastTestResult: TestResult | null;
-  onStartTest: (testId: string) => void;
+  onStartTest: (testId: string, testTitle: string) => void;
   onViewTestDetails: (result: TestResult) => void;
   testHistory: TestResult[];
   onLogout: () => void;
@@ -93,7 +93,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   lastTestResult,
   onStartTest,
   onViewTestDetails,
-  testHistory1,
+
   onLogout,
   user,
 }) => {
@@ -119,7 +119,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   useEffect(() => {
     const fetchTestHistory = async () => {
       try {
-        const response = await axios.get(`${Backend_URL}/api/tests/history`,
+        const response = await axios.get(
+          `${Backend_URL}/api/tests/history`,
           // "http://localhost:5000/api/tests/history",
           {
             headers: {
@@ -154,6 +155,34 @@ const Dashboard: React.FC<DashboardProps> = ({
       title: "Test Result",
       message: "Your JEE Main Mock Test results are ready",
       time: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+      read: true,
+    },
+    {
+      id: "3",
+      title: "Upcoming Test Reminder",
+      message: "Don't forget your upcoming Physics test tomorrow.",
+      time: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
+      read: false,
+    },
+    {
+      id: "4",
+      title: "New Study Material Added",
+      message: "New practice questions for Chemistry have been uploaded.",
+      time: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago
+      read: true,
+    },
+    {
+      id: "5",
+      title: "Leaderboard Updated",
+      message: "The leaderboard has been updated with your latest test score.",
+      time: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+      read: false,
+    },
+    {
+      id: "6",
+      title: "Test Score Improved",
+      message: "Great job! Your latest test score has improved significantly.",
+      time: new Date(Date.now() - 1000 * 60 * 60 * 48), // 2 days ago
       read: true,
     },
   ]);
@@ -263,7 +292,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       {availableTests.map((test) => (
                         <button
                           key={test.id}
-                          onClick={() => onStartTest(test.id)}
+                          onClick={() => onStartTest(test.id, test.title)}
                           className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
                         >
                           <BookMarked className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
@@ -510,8 +539,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                               {test.subject}
                             </p>
                           </div>
+
                           <button
-                            onClick={() => onStartTest(test.id)}
+                            onClick={() => {
+                              onStartTest(test.id, test.title);
+                            }}
                             className="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
                           >
                             Start
@@ -579,7 +611,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <button
                           key={test.id}
                           onClick={() => {
-                            onStartTest(test.id);
+                            onStartTest(test.id, test.title);
                             setSearchQuery("");
                           }}
                           className="w-full px-4 py-2 text-left hover:bg-gray-50"

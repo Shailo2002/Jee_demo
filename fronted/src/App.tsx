@@ -41,6 +41,8 @@ function App() {
   const [currentView, setCurrentView] = useState<View>("dashboard");
   const [selectedResult, setSelectedResult] = useState<TestResult | null>(null);
   const [testHistory, setTestHistory] = useState<TestResult[]>([]);
+  const [currentTestId, setCurrentTestId] = useState<string | null>(null);
+  const [currentTestTitle, setCurrentTestTitle] = useState<string | null>(null);
 
   const handleLogin = (userData: User) => {
     setUser(userData);
@@ -89,6 +91,9 @@ function App() {
     localStorage.removeItem("token");
   };
 
+  const handleSectionChange = (section: string) => {
+    setCurrentSection(section);
+  };
 
   // Protected Route component
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -132,8 +137,14 @@ function App() {
                 {currentView === "test" && selectedTestId && (
                   <TestInterface
                     currentSection={currentSection}
-                    onSectionChange={setCurrentSection}
+                    onSectionChange={handleSectionChange}
                     onTestComplete={handleTestComplete}
+                    testId={selectedTestId}
+                    testTitle={
+                      selectedTestId === "test1"
+                        ? "JEE Mock Test 1"
+                        : "JEE Mock Test 2"
+                    }
                   />
                 )}
                 {currentView === "analysis" && selectedResult && (
