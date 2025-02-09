@@ -39,10 +39,19 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
   console.log("TestInterface Props - testId:", testId);
   console.log("TestInterface Props - testTitle:", testTitle);
 
-  const [timeLeft, setTimeLeft] = useState(180 * 60); // 180 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const savedTime = localStorage.getItem(`test_${testId}_timeLeft`);
+    return savedTime ? parseInt(savedTime) : 180 * 60;
+  });
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [markedForReview, setMarkedForReview] = useState<number[]>([]);
+  const [answers, setAnswers] = useState<Record<number, string>>(() => {
+    const savedAnswers = localStorage.getItem(`test_${testId}_answers`);
+    return savedAnswers ? JSON.parse(savedAnswers) : {};
+  });
+  const [markedForReview, setMarkedForReview] = useState<number[]>(() => {
+    const savedMarked = localStorage.getItem(`test_${testId}_markedForReview`);
+    return savedMarked ? JSON.parse(savedMarked) : [];
+  });
   const [isPaletteCollapsed, setIsPaletteCollapsed] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [testResult, setTestResult] = useState({
@@ -55,7 +64,12 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
   });
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [isTestSubmitted, setIsTestSubmitted] = useState(false);
-  const [visitedQuestions, setVisitedQuestions] = useState<number[]>([]);
+  const [visitedQuestions, setVisitedQuestions] = useState<number[]>(() => {
+    const savedVisited = localStorage.getItem(
+      `test_${testId}_visitedQuestions`
+    );
+    return savedVisited ? JSON.parse(savedVisited) : [];
+  });
   const [unsavedAnswer, setUnsavedAnswer] = useState<string | null>(null);
   const [showWarning, setShowWarning] = useState(false);
   const [attemptedNavigation, setAttemptedNavigation] = useState<number | null>(
@@ -107,6 +121,28 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
       }
     };
   }, [currentQuestion, isTestSubmitted]);
+
+  useEffect(() => {
+    localStorage.setItem(`test_${testId}_timeLeft`, timeLeft.toString());
+  }, [timeLeft, testId]);
+
+  useEffect(() => {
+    localStorage.setItem(`test_${testId}_answers`, JSON.stringify(answers));
+  }, [answers, testId]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      `test_${testId}_markedForReview`,
+      JSON.stringify(markedForReview)
+    );
+  }, [markedForReview, testId]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      `test_${testId}_visitedQuestions`,
+      JSON.stringify(visitedQuestions)
+    );
+  }, [visitedQuestions, testId]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -161,8 +197,18 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
     if (shouldSave && unsavedAnswer && attemptedNavigation) {
       setAnswers((prev) => ({ ...prev, [currentQuestion]: unsavedAnswer }));
       setCurrentQuestion(attemptedNavigation);
+      
+      // Determine and set section based on question number
+      const section = getCurrentSection(attemptedNavigation);
+      onSectionChange(section);
+      localStorage.setItem(`test_${testId}_currentSection`, section);
     } else if (!shouldSave && attemptedNavigation) {
       setCurrentQuestion(attemptedNavigation);
+      
+      // Determine and set section based on question number
+      const section = getCurrentSection(attemptedNavigation);
+      onSectionChange(section);
+      localStorage.setItem(`test_${testId}_currentSection`, section);
     }
     setUnsavedAnswer(null);
     setShowWarning(false);
@@ -299,6 +345,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
         setShowResult(true);
         setIsTestSubmitted(true);
         onTestComplete(result);
+        cleanupLocalStorage();
       }
     } catch (error) {
       console.error("Error submitting test:", error);
@@ -306,6 +353,23 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
       // For example, using a toast notification
     }
   };
+
+  const cleanupLocalStorage = () => {
+    localStorage.removeItem(`test_${testId}_timeLeft`);
+    localStorage.removeItem(`test_${testId}_answers`);
+    localStorage.removeItem(`test_${testId}_markedForReview`);
+    localStorage.removeItem(`test_${testId}_visitedQuestions`);
+    localStorage.removeItem(`test_${testId}_currentView`);
+    localStorage.removeItem(`test_${testId}_currentSection`);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (isTestSubmitted) {
+        cleanupLocalStorage();
+      }
+    };
+  }, [isTestSubmitted, testId]);
 
   // Helper function to get current section based on question number
   const getCurrentSection = (questionNum: number) => {
@@ -315,8 +379,23 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
     return "physics"; // default
   };
 
-  // Modified section change handler
+  // Modified section change handler with better state management
   const handleSectionChange = (section: string) => {
+    if (unsavedAnswer) {
+      setShowWarning(true);
+      const questionMap = {
+        physics: 1,
+        chemistry: 26,
+        maths: 51,
+      };
+      setAttemptedNavigation(questionMap[section as keyof typeof questionMap]);
+      return;
+    }
+
+    // Save current view in localStorage
+    localStorage.setItem(`test_${testId}_currentView`, 'test');
+    localStorage.setItem(`test_${testId}_currentSection`, section);
+
     const questionMap = {
       physics: 1,
       chemistry: 26,
@@ -324,9 +403,25 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
     };
 
     const targetQuestion = questionMap[section as keyof typeof questionMap];
-    handleQuestionSelect(targetQuestion);
+    setCurrentQuestion(targetQuestion); // Directly set current question instead of using handleQuestionSelect
     onSectionChange(section);
   };
+
+  // Add useEffect to handle initial section and view restoration
+  useEffect(() => {
+    const savedView = localStorage.getItem(`test_${testId}_currentView`);
+    const savedSection = localStorage.getItem(`test_${testId}_currentSection`);
+    
+    if (savedView === 'test' && savedSection) {
+      onSectionChange(savedSection);
+      const questionMap = {
+        physics: 1,
+        chemistry: 26,
+        maths: 51,
+      };
+      setCurrentQuestion(questionMap[savedSection as keyof typeof questionMap]);
+    }
+  }, [testId]);
 
   return (
     <div className="flex h-[calc(100vh-64px)]">
@@ -343,8 +438,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
               <div className="px-4 flex items-center justify-between">
                 <nav className="flex space-x-1 py-2">
                   {["physics", "chemistry", "maths"].map((section) => {
-                    const isCurrentSection =
-                      getCurrentSection(currentQuestion) === section;
+                    const isCurrentSection = getCurrentSection(currentQuestion) === section;
                     return (
                       <button
                         key={section}
@@ -356,11 +450,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
                               ? "bg-blue-600 text-white shadow-sm"
                               : "text-gray-600 hover:bg-gray-100"
                           }
-                          ${
-                            isTestSubmitted
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                          }
+                          ${isTestSubmitted ? "opacity-50 cursor-not-allowed" : ""}
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
                         `}
                         disabled={isTestSubmitted}
                       >
