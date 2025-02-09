@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -36,13 +36,38 @@ type View = "dashboard" | "instructions" | "test" | "analysis";
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
+  const [selectedTestId, setSelectedTestId] = useState<string | null>(() => {
+    return localStorage.getItem("selectedTestId");
+  });
   const [currentSection, setCurrentSection] = useState("physics");
-  const [currentView, setCurrentView] = useState<View>("dashboard");
+  const [currentView, setCurrentView] = useState<View>(() => {
+    const savedView = localStorage.getItem("currentView");
+    return (savedView as View) || "dashboard";
+  });
   const [selectedResult, setSelectedResult] = useState<TestResult | null>(null);
   const [testHistory, setTestHistory] = useState<TestResult[]>([]);
   const [currentTestId, setCurrentTestId] = useState<string | null>(null);
-  const [currentTestTitle, setCurrentTestTitle] = useState<string | null>(null);
+  const [currentTestTitle, setCurrentTestTitle] = useState<string | null>(
+    () => {
+      return localStorage.getItem("currentTestTitle");
+    }
+  );
+
+  useEffect(() => {
+    if (currentView) {
+      localStorage.setItem("currentView", currentView);
+    }
+    if (selectedTestId) {
+      localStorage.setItem("selectedTestId", selectedTestId);
+    } else {
+      localStorage.removeItem("selectedTestId");
+    }
+    if (currentTestTitle) {
+      localStorage.setItem("currentTestTitle", currentTestTitle);
+    } else {
+      localStorage.removeItem("currentTestTitle");
+    }
+  }, [currentView, selectedTestId, currentTestTitle]);
 
   const handleLogin = (userData: User) => {
     setUser(userData);
@@ -69,6 +94,9 @@ function App() {
     setSelectedResult(newResult);
     setTestHistory((prev) => [...prev, newResult]);
     setCurrentView("analysis");
+    localStorage.removeItem("currentView");
+    localStorage.removeItem("selectedTestId");
+    localStorage.removeItem("currentTestTitle");
   };
 
   const handleViewTestDetails = (result: TestResult) => {
@@ -80,6 +108,9 @@ function App() {
     setCurrentView("dashboard");
     setSelectedTestId(null);
     setSelectedResult(null);
+    localStorage.removeItem("currentView");
+    localStorage.removeItem("selectedTestId");
+    localStorage.removeItem("currentTestTitle");
   };
 
   const handleLogout = () => {
@@ -89,6 +120,9 @@ function App() {
     setCurrentView("dashboard");
     localStorage.removeItem("userdata");
     localStorage.removeItem("token");
+    localStorage.removeItem("currentView");
+    localStorage.removeItem("selectedTestId");
+    localStorage.removeItem("currentTestTitle");
   };
 
   const handleSectionChange = (section: string) => {
