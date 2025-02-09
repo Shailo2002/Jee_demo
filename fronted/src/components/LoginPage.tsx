@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, Github } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Backend_URL } from "../contant";
+
 interface LoginProps {
   onLogin: (user: User) => void;
   isSignUp?: boolean;
@@ -77,7 +79,8 @@ const LoginPage: React.FC<LoginProps> = ({
         // Handle sign up
 
         const newUser = await axios.post(
-          "http://localhost:5000/api/auth/register",
+          `${Backend_URL}/api/auth/register`,
+          // "http://localhost:5000/api/auth/register",
           {
             email,
             password,
@@ -88,7 +91,8 @@ const LoginPage: React.FC<LoginProps> = ({
       } else {
         // Handle sign in
         const newUser = await axios.post(
-          "http://localhost:5000/api/auth/login",
+          `${Backend_URL}/api/auth/login`,
+          // "http://localhost:5000/api/auth/login",
           {
             email,
             password,
@@ -98,7 +102,6 @@ const LoginPage: React.FC<LoginProps> = ({
         localStorage.setItem("token", JSON.stringify(newUser.data.token));
         localStorage.setItem("userdata", JSON.stringify(newUser.data.user));
       }
-
     } catch (error) {
       console.error("Authentication error:", error);
     } finally {
