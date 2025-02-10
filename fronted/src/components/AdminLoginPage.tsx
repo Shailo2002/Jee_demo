@@ -97,6 +97,7 @@ const AdminLoginPage = () => {
                 <div className="mt-1">
                   <input
                     type="email"
+                    name="email"
                     required
                     value={formData.email}
                     onChange={handleChange}
@@ -113,6 +114,7 @@ const AdminLoginPage = () => {
                 <div className="mt-1">
                   <input
                     type="password"
+                    name="password"
                     required
                     value={formData.password}
                     onChange={handleChange}
