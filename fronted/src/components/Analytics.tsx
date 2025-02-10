@@ -1,6 +1,17 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Clock, Target, Brain, TrendingUp } from 'lucide-react';
+import React from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import { Clock, Target, Brain, TrendingUp } from "lucide-react";
 
 interface TestResult {
   score: number;
@@ -23,23 +34,28 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
   const subjectScores = {
     Physics: 75,
     Chemistry: 68,
-    Mathematics: 82
+    Mathematics: 82,
   };
 
   // Prepare data for time distribution chart
   const timeDistribution = [
-    { name: '0-30 sec', value: 25 },
-    { name: '30-60 sec', value: 40 },
-    { name: '60-90 sec', value: 20 },
-    { name: '90+ sec', value: 15 }
+    { name: "0-30 sec", value: 25 },
+    { name: "30-60 sec", value: 40 },
+    { name: "60-90 sec", value: 20 },
+    { name: "90+ sec", value: 15 },
   ];
 
   // Colors for charts
-  const COLORS = ['#3B82F6', '#34D399', '#F87171', '#A78BFA'];
+  const COLORS = ["#3B82F6", "#34D399", "#F87171", "#A78BFA"];
 
   // Calculate performance metrics
-  const averageScore = testHistory.reduce((acc, test) => acc + test.score, 0) / testHistory.length;
-  const averageAccuracy = testHistory.reduce((acc, test) => acc + (test.correct / test.attempted) * 100, 0) / testHistory.length;
+  const averageScore =
+    testHistory.reduce((acc, test) => acc + test.score, 0) / testHistory.length;
+  const averageAccuracy =
+    testHistory.reduce(
+      (acc, test) => acc + (test.correct / test.attempted) * 100,
+      0
+    ) / testHistory.length;
 
   return (
     <>
@@ -47,8 +63,10 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
       <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <h1 className="text-2xl font-bold text-white">Analytics</h1>
-          <p className="mt-1 text-blue-100">Track your performance and progress</p>
-          
+          <p className="mt-1 text-blue-100">
+            Track your performance and progress
+          </p>
+
           {/* Quick Stats in Header */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
@@ -62,7 +80,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
                 <Target className="w-8 h-8 text-blue-100" />
               </div>
             </div>
-            
+
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -74,7 +92,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
                 <Brain className="w-8 h-8 text-blue-100" />
               </div>
             </div>
-            
+
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -86,7 +104,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
                 <Clock className="w-8 h-8 text-blue-100" />
               </div>
             </div>
-            
+
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -105,7 +123,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Score Trends */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Score Trends</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Score Trends
+            </h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
@@ -124,12 +144,16 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
 
           {/* Subject-wise Performance */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Subject Performance</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Subject Performance
+            </h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={Object.entries(subjectScores).map(([name, value]) => ({ name, value }))}
+                    data={Object.entries(subjectScores).map(
+                      ([name, value]) => ({ name, value })
+                    )}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -139,7 +163,10 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
                     dataKey="value"
                   >
                     {Object.entries(subjectScores).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -150,7 +177,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
 
           {/* Time Distribution */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Time Distribution</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Time Distribution
+            </h2>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
@@ -169,7 +198,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
 
           {/* Improvement Areas */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Areas for Improvement</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Areas for Improvement
+            </h2>
             <div className="space-y-4">
               {Object.entries(subjectScores).map(([subject, score]) => (
                 <div key={subject}>
@@ -178,9 +209,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
                     <span className="text-blue-600 font-medium">{score}%</span>
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-blue-500 rounded-full" 
-                      style={{ width: `${score}%` }} 
+                    <div
+                      className="h-full bg-blue-500 rounded-full"
+                      style={{ width: `${score}%` }}
                     />
                   </div>
                 </div>
@@ -193,4 +224,4 @@ const Analytics: React.FC<AnalyticsProps> = ({ testHistory }) => {
   );
 };
 
-export default Analytics; 
+export default Analytics;
