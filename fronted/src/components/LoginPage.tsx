@@ -65,6 +65,53 @@ const LoginPage: React.FC<LoginProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (!validateForm()) return;
+
+  //   setIsLoading(true);
+  //   try {
+  //     // Simulate API call
+
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  //     if (isSignUp) {
+  //       // Handle sign up
+
+  //       const newUser = await axios.post(
+  //         `${Backend_URL}/api/auth/register`,
+  //         // "http://localhost:5000/api/auth/register",
+  //         {
+  //           email,
+  //           password,
+  //           fullName: name,
+  //         }
+  //       );
+  //       onLogin(newUser.data.user);
+  //     } else {
+  //       // Handle sign in
+  //       const newUser = await axios.post(
+  //         `${Backend_URL}/api/auth/login`,
+  //         // "http://localhost:5000/api/auth/login",
+  //         {
+  //           email,
+  //           password,
+  //         }
+  //       );
+  //       console.log("check in handleSubmit");
+  //       onLogin(newUser.data.user);
+  //       localStorage.setItem("token", JSON.stringify(newUser.data.token));
+  //       localStorage.setItem("userdata", JSON.stringify(newUser.data.user));
+  //     }
+  //   } catch (error) {
+  //     alert("Invalid credentials");
+  //     console.error("Authentication error:", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -73,40 +120,58 @@ const LoginPage: React.FC<LoginProps> = ({
     setIsLoading(true);
     try {
       // Simulate API call
-
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       if (isSignUp) {
         // Handle sign up
-
-        const newUser = await axios.post(
-          `${Backend_URL}/api/auth/register`,
-          // "http://localhost:5000/api/auth/register",
-          {
+        try {
+          const newUser = await axios.post(`${Backend_URL}/api/auth/register`, {
             email,
             password,
             fullName: name,
+          });
+          onLogin(newUser.data.user);
+        } catch (error: any) {
+          if (error.response && error.response.status === 400) {
+            alert("Email already exists. Please use a different email.");
+          } else {
+            alert("Signup failed. Please try again later.");
           }
-        );
-        onLogin(newUser.data.user);
+          console.error("Signup error:", error);
+        }
       } else {
         // Handle sign in
-        const newUser = await axios.post(
-          `${Backend_URL}/api/auth/login`,
-          // "http://localhost:5000/api/auth/login",
-          {
+        try {
+          const newUser = await axios.post(`${Backend_URL}/api/auth/login`, {
             email,
             password,
+          });
+          console.log("check in handleSubmit");
+          onLogin(newUser.data.user);
+          localStorage.setItem("token", JSON.stringify(newUser.data.token));
+          localStorage.setItem("userdata", JSON.stringify(newUser.data.user));
+        } catch (error: unknown) {
+          console.error("Login error response:", error?.response); // Debugging line
+          if (error && typeof error === "object" && "response" in error) {
+            const errorResponse = error.response as { status: number };
+            switch (errorResponse.status) {
+              case 404:
+                alert("User not found. Please check your email.");
+                break;
+              case 401:
+                alert("Incorrect password. Please try again.");
+                break;
+              default:
+                alert("Login failed. Please try again later.");
+            }
+          } else {
+            alert(
+              "An unexpected error occurred. Please check your network and try again."
+            );
           }
-        );
-        console.log("check in handleSubmit");
-        onLogin(newUser.data.user);
-        localStorage.setItem("token", JSON.stringify(newUser.data.token));
-        localStorage.setItem("userdata", JSON.stringify(newUser.data.user));
+          console.error("Authentication error:", error);
+        }
       }
-    } catch (error) {
-      alert("Invalid credentials");
-      console.error("Authentication error:", error);
     } finally {
       setIsLoading(false);
     }
