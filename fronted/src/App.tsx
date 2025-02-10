@@ -10,6 +10,9 @@ import Dashboard from "./components/Dashboard";
 import TestAnalysis from "./components/TestAnalysis";
 import LoginPage from "./components/LoginPage";
 import Instructions from "./components/Instructions";
+import LandingPage from "./components/LandingPage";
+import AdminLoginPage from "./components/AdminLoginPage";
+import AdminDashboard from "./components/AdminDashboard";
 
 interface TestResult {
   score: number;
@@ -141,13 +144,14 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-50">
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route
             path="/login"
             element={
               !isLoggedIn ? (
                 <LoginPage onLogin={handleLogin} isSignUp={false} />
               ) : (
-                <Navigate to="/" replace />
+                <Navigate to="/dashboard" replace />
               )
             }
           />
@@ -157,12 +161,12 @@ function App() {
               !isLoggedIn ? (
                 <LoginPage onLogin={handleLogin} isSignUp={true} />
               ) : (
-                <Navigate to="/" replace />
+                <Navigate to="/dashboard" replace />
               )
             }
           />
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 {currentView === "instructions" && selectedTestId && (
@@ -197,6 +201,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/adminlogin" element={<AdminLoginPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
     </Router>
