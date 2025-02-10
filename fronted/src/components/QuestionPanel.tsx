@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { CheckCircle, Circle, HelpCircle, ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  CheckCircle,
+  Circle,
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 
 interface QuestionPanelProps {
   questionId: number;
@@ -23,15 +31,15 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
   onQuestionSelect,
 }) => {
   // Use the unsaved answer if available, otherwise use the saved answer
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
 
   // Update selectedAnswer when props change
   useEffect(() => {
     // If there's no answer (cleared) but question is visited, keep selection empty
     if (!answer && !unsavedAnswer) {
-      setSelectedAnswer('');
+      setSelectedAnswer("");
     } else {
-      setSelectedAnswer(unsavedAnswer || answer || '');
+      setSelectedAnswer(unsavedAnswer || answer || "");
     }
   }, [unsavedAnswer, answer]);
 
@@ -39,11 +47,11 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
   const question = {
     text: "The dimension of B²/2μ₀, where B is magnetic field and μ₀ is the magnetic permeability of vacuum, is:",
     options: [
-      { id: '1', text: 'ML¹T⁻²' },
-      { id: '2', text: 'MLT⁻²' },
-      { id: '3', text: 'ML⁻¹T⁻²' },
-      { id: '4', text: 'ML²T⁻²' }
-    ]
+      { id: "1", text: "ML¹T⁻²" },
+      { id: "2", text: "MLT⁻²" },
+      { id: "3", text: "ML⁻¹T⁻²" },
+      { id: "4", text: "ML²T⁻²" },
+    ],
   };
 
   const handleOptionSelect = (optionId: string) => {
@@ -56,8 +64,8 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
   };
 
   const handleClearResponse = () => {
-    setSelectedAnswer(''); // Clear the radio button selection
-    onAnswer(questionId, ''); // Clear any unsaved answer
+    setSelectedAnswer(""); // Clear the radio button selection
+    onAnswer(questionId, ""); // Clear any unsaved answer
     onSaveAndNext(questionId, null); // Remove the answer from parent state
   };
 
@@ -74,9 +82,9 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md max-h-[calc(100vh-200px)] overflow-y-auto">
+    <div className="bg-white rounded-lg shadow-md max-h-[calc(100vh-200px)] overflow-y-auto w-full">
       {/* Question Header */}
-      <div className="border-b border-gray-200 p-4 flex justify-between items-center">
+      <div className="border-b border-gray-200 p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
         <h2 className="text-lg font-semibold">Question {questionId}</h2>
         <div className="flex items-center space-x-4">
           <button className="p-2 hover:bg-gray-100 rounded-full">
@@ -101,8 +109,8 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
               key={option.id}
               className={`flex items-center p-3 rounded-lg border ${
                 selectedAnswer === option.id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:bg-gray-50'
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-200 hover:bg-gray-50"
               } cursor-pointer transition-colors`}
             >
               <input
@@ -125,20 +133,20 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="border-t border-gray-200 p-4 flex items-center justify-between">
-        <div className="flex space-x-3">
-          <button 
+      <div className="border-t border-gray-200 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+          <button
             onClick={handleClearResponse}
-            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded w-full sm:w-auto"
           >
             Clear Response
           </button>
           <button
             onClick={() => onMarkForReview(questionId)}
-            className={`px-4 py-2 rounded flex items-center space-x-2 ${
+            className={`px-4 py-2 rounded flex items-center justify-center space-x-2 w-full sm:w-auto ${
               isMarkedForReview
-                ? 'bg-purple-100 text-purple-700'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? "bg-purple-100 text-purple-700"
+                : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             <HelpCircle className="w-5 h-5" />
@@ -146,15 +154,16 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
           </button>
         </div>
 
-        <div className="flex items-center space-x-3">
-          <button 
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+          <button
             onClick={handlePrevious}
             disabled={questionId === 1}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
-              ${questionId === 1 
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors
+              ${
+                questionId === 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              } w-full sm:w-auto`}
           >
             <ChevronLeft className="w-5 h-5" />
             Previous
@@ -162,8 +171,8 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
 
           <button
             onClick={handleSaveAndNext}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
-              bg-blue-600 text-white hover:bg-blue-700"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors
+              bg-blue-600 text-white hover:bg-blue-700 w-full sm:w-auto"
           >
             Save & Next
           </button>
@@ -171,11 +180,12 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
           <button
             onClick={handleNext}
             disabled={questionId === 75}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
-              ${questionId === 75
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors
+              ${
+                questionId === 75
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              } w-full sm:w-auto`}
           >
             Next
             <ChevronRight className="w-5 h-5" />
@@ -195,10 +205,10 @@ const QuestionPanel: React.FC<QuestionPanelProps> = ({
           )}
           <span>
             {selectedAnswer
-              ? 'Answered'
+              ? "Answered"
               : isMarkedForReview
-              ? 'Marked for Review'
-              : 'Not Answered'}
+              ? "Marked for Review"
+              : "Not Answered"}
           </span>
         </div>
       </div>

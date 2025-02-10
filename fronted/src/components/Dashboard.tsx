@@ -336,31 +336,29 @@ const Dashboard: React.FC<DashboardProps> = ({
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-6">
                   {/* Quick Actions */}
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
                       Quick Actions
                     </h2>
-                    <div className="max-h-[240px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-50 pr-2">
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        {upcomingTests.map((test) => (
-                          <button
-                            key={test.id}
-                            onClick={() => onStartTest(test.id, test.title)}
-                            className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
-                          >
-                            <BookMarked className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
-                            <span className="text-sm font-medium text-gray-700 text-center group-hover:text-blue-600">
-                              {test.title}
-                            </span>
-                          </button>
-                        ))}
-                        <button className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group">
-                          <Target className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
-                          <span className="text-sm font-medium text-gray-700 text-center group-hover:text-purple-600">
-                            Practice Tests
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {upcomingTests.map((test) => (
+                        <button
+                          key={test.id}
+                          onClick={() => onStartTest(test.id, test.title)}
+                          className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all group"
+                        >
+                          <BookMarked className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+                          <span className="text-sm font-medium text-gray-700 text-center group-hover:text-blue-600">
+                            {test.title}
                           </span>
                         </button>
-                      </div>
+                      ))}
+                      <button className="flex flex-col items-center p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all group">
+                        <Target className="w-6 h-6 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
+                        <span className="text-sm font-medium text-gray-700 text-center group-hover:text-purple-600">
+                          Practice Tests
+                        </span>
+                      </button>
                     </div>
                   </div>
 
@@ -435,7 +433,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                   {/* Test History */}
                   <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="p-6 border-b border-gray-100">
+                    <div className="p-4 sm:p-6 border-b border-gray-100">
                       <h2 className="text-lg font-semibold text-gray-800">
                         Recent Tests
                       </h2>
@@ -530,7 +528,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 {/* Sidebar */}
                 <div className="space-y-6">
                   {/* Progress Card */}
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
                       Your Progress
                     </h2>
@@ -575,7 +573,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   </div>
 
                   {/* Upcoming Tests */}
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">
                       Upcoming Tests
                     </h2>

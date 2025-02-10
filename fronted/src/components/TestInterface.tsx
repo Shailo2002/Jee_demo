@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Timer, AlertCircle } from "lucide-react";
+import { Timer, AlertCircle, Clock } from "lucide-react";
 import QuestionPanel from "./QuestionPanel";
 import QuestionPalette from "./QuestionPalette";
 import ResultModal from "./ResultModal";
@@ -450,8 +450,8 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
           <div className="max-w-7xl mx-auto">
             {/* Section Navigation */}
             <div className="border-b">
-              <div className="px-4 flex items-center justify-between">
-                <nav className="flex space-x-1 py-2">
+              <div className="px-4 flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0">
+                <nav className="flex flex-wrap justify-center gap-2 py-2 w-full sm:w-auto">
                   {["physics", "chemistry", "maths"].map((section) => {
                     const isCurrentSection =
                       getCurrentSection(currentQuestion) === section;
@@ -460,7 +460,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
                         key={section}
                         onClick={() => handleSectionChange(section)}
                         className={`
-                          px-8 py-2.5 rounded-lg font-medium transition-all
+                          px-4 sm:px-8 py-2.5 rounded-lg font-medium transition-all text-sm sm:text-base
                           ${
                             isCurrentSection
                               ? "bg-blue-600 text-white shadow-sm"
@@ -472,6 +472,7 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
                               : ""
                           }
                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+                          flex-1 sm:flex-none
                         `}
                         disabled={isTestSubmitted}
                       >
@@ -482,38 +483,25 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
                 </nav>
 
                 {/* Timer */}
-                <div className="flex items-center gap-2 py-2">
-                  <div
-                    className={`
-                    flex items-center gap-2 px-4 py-2 rounded-lg
-                    ${timeLeft < 300 ? "bg-red-50" : "bg-gray-50"}
-                  `}
-                  >
-                    <Timer
-                      className={`w-5 h-5 ${
-                        timeLeft < 300
-                          ? "text-red-600 animate-pulse"
-                          : "text-gray-600"
-                      }`}
-                    />
-                    <span
-                      className={`
-                      font-mono font-medium text-lg
-                      ${timeLeft < 300 ? "text-red-600" : "text-gray-700"}
-                    `}
-                    >
+                <div className="flex items-center space-x-4 py-2 w-full sm:w-auto justify-center sm:justify-end">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-5 h-5 text-gray-500" />
+                    <span className="text-lg font-semibold text-gray-700">
                       {formatTime(timeLeft)}
                     </span>
                   </div>
 
+                  {/* Add Submit Test Button */}
                   <button
                     onClick={handleSubmitTest}
                     className={`
-                      px-6 py-2 rounded-lg font-medium transition-colors
+                      px-4 py-2 rounded-lg font-medium transition-colors
                       ${
                         isTestSubmitted
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-green-600 hover:bg-green-700 text-white shadow-sm"
+                          : timeLeft < 300
+                          ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
+                          : "bg-green-600 hover:bg-green-700 text-white"
                       }
                     `}
                     disabled={isTestSubmitted}
@@ -523,53 +511,53 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Main Content Area */}
-            <div className="max-w-4xl mx-auto p-6">
-              {/* Warning Modal */}
-              {showWarning && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <AlertCircle className="w-6 h-6 text-yellow-500" />
-                      <h3 className="text-lg font-semibold">Unsaved Answer</h3>
-                    </div>
-                    <p className="text-gray-600 mb-6">
-                      You have selected an answer but haven't saved it. Would
-                      you like to save before moving to another question?
-                    </p>
-                    <div className="flex justify-end space-x-3">
-                      <button
-                        onClick={() => handleWarningResponse(false)}
-                        className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        Don't Save
-                      </button>
-                      <button
-                        onClick={() => handleWarningResponse(true)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        Save & Continue
-                      </button>
-                    </div>
-                  </div>
+        {/* Main Content Area */}
+        <div className="max-w-4xl mx-auto p-6">
+          {/* Warning Modal */}
+          {showWarning && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl">
+                <div className="flex items-center space-x-3 mb-4">
+                  <AlertCircle className="w-6 h-6 text-yellow-500" />
+                  <h3 className="text-lg font-semibold">Unsaved Answer</h3>
                 </div>
-              )}
-
-              {/* Question Panel */}
-              <div className="bg-white rounded-xl shadow-sm">
-                <QuestionPanel
-                  questionId={currentQuestion}
-                  answer={answers[currentQuestion]}
-                  unsavedAnswer={unsavedAnswer}
-                  isMarkedForReview={markedForReview.includes(currentQuestion)}
-                  onAnswer={handleAnswer}
-                  onMarkForReview={handleMarkForReview}
-                  onSaveAndNext={handleSaveAndNext}
-                  onQuestionSelect={handleQuestionSelect}
-                />
+                <p className="text-gray-600 mb-6">
+                  You have selected an answer but haven't saved it. Would you
+                  like to save before moving to another question?
+                </p>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => handleWarningResponse(false)}
+                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    Don't Save
+                  </button>
+                  <button
+                    onClick={() => handleWarningResponse(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Save & Continue
+                  </button>
+                </div>
               </div>
             </div>
+          )}
+
+          {/* Question Panel */}
+          <div className="bg-white rounded-xl shadow-sm">
+            <QuestionPanel
+              questionId={currentQuestion}
+              answer={answers[currentQuestion]}
+              unsavedAnswer={unsavedAnswer}
+              isMarkedForReview={markedForReview.includes(currentQuestion)}
+              onAnswer={handleAnswer}
+              onMarkForReview={handleMarkForReview}
+              onSaveAndNext={handleSaveAndNext}
+              onQuestionSelect={handleQuestionSelect}
+            />
           </div>
         </div>
 
