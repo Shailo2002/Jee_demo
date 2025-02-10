@@ -11,6 +11,8 @@ import TestAnalysis from "./components/TestAnalysis";
 import LoginPage from "./components/LoginPage";
 import Instructions from "./components/Instructions";
 import LandingPage from "./components/LandingPage";
+import AdminLoginPage from "./components/AdminLoginPage";
+import AdminDashboard from "./components/AdminDashboard";
 
 interface TestResult {
   score: number;
@@ -199,6 +201,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/adminlogin" element={<AdminLoginPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
     </Router>
