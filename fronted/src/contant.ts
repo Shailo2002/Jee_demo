@@ -1,1 +1,1 @@
-export const Backend_URL="http://localhost:5000"
+export const Backend_URL="http://10.81.46.150:5000"
