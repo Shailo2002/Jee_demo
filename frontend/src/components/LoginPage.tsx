@@ -80,6 +80,7 @@ const LoginPage: React.FC<LoginProps> = ({
       if (isSignUp) {
         // Handle sign up
         try {
+          console.log("signup route call")
           const newUser = await axios.post(`${Backend_URL}/api/auth/register`, {
             email: formData.email,
             password: formData.password,
